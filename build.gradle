@@ -1,0 +1,62 @@
+plugins {
+    id("groovy") 
+    id("com.github.johnrengelman.shadow") version "7.1.1"
+    id("io.micronaut.application") version "3.2.1"
+}
+
+version = "0.1"
+group = "pooper.user.api"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    annotationProcessor("io.micronaut.data:micronaut-data-processor:3.3.0")
+    annotationProcessor("io.micronaut.security:micronaut-security-annotations:3.5.0")
+    annotationProcessor("io.micronaut.openapi:micronaut-openapi:4.0.1")
+
+    implementation("io.micronaut.openapi:micronaut-openapi:4.0.1")
+    implementation("io.swagger.core.v3:swagger-annotations")
+    implementation("io.micronaut.cache:micronaut-cache-caffeine")
+    implementation("io.micronaut.security:micronaut-security-jwt:3.5.0")
+    implementation("io.micronaut.reactor:micronaut-reactor")
+    implementation("io.micronaut.data:micronaut-data-hibernate-jpa:3.3.0")
+    implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut.groovy:micronaut-runtime-groovy")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("io.micronaut:micronaut-validation")
+
+    compileOnly("io.micronaut:micronaut-http-validation")
+
+    runtimeOnly("mysql:mysql-connector-java")
+    runtimeOnly("ch.qos.logback:logback-classic")
+
+    testImplementation "io.micronaut:micronaut-inject-java-test"
+}
+
+
+application {
+    mainClass.set("pooper.user.api.Application")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("11")
+    targetCompatibility = JavaVersion.toVersion("11")
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("netty")
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("pooper.user.api.*")
+    }
+}
+
+tasks.withType(GroovyCompile) {
+    groovyOptions.forkOptions.jvmArgs.add('-Dgroovy.parameters=true')
+    groovyOptions.forkOptions.jvmArgs.add('-Dmicronaut.openapi.views.spec=swagger-ui.enabled=true,swagger-ui.theme=flattop')
+}
